@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NexaHome — Smart Environment Monitor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">⬡</div>
+      <div class="logo-text">
+        <span class="logo-main">NEXA</span><span class="logo-sub">HOME</span>
+      </div>
+    </div>
+
+    <div class="sidebar-status">
+      <div class="sys-status online">
+        <span class="ss-dot"></span>
+        <span>System Online</span>
+      </div>
+      <div class="sys-time" id="sysTime">--:--:--</div>
+      <div class="sys-date" id="sysDate">---</div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-view="dashboard" onclick="setView(this)">
+        <span class="ni-icon">◉</span><span>Dashboard</span>
+      </button>
+      <button class="nav-item" data-view="sensors" onclick="setView(this)">
+        <span class="ni-icon">◈</span><span>Sensors</span>
+      </button>
+      <button class="nav-item" data-view="alerts" onclick="setView(this)">
+        <span class="ni-icon">◬</span><span>Alerts</span>
+        <span class="nav-badge" id="alertBadge">0</span>
+      </button>
+      <button class="nav-item" data-view="devices" onclick="setView(this)">
+        <span class="ni-icon">⬡</span><span>Devices</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sf-row">
+        <span class="sf-label">Sensors Active</span>
+        <span class="sf-val" id="activeSensors">12/12</span>
+      </div>
+      <div class="sf-row">
+        <span class="sf-label">Network</span>
+        <span class="sf-val green">Connected</span>
+      </div>
+      <div class="sf-row">
+        <span class="sf-label">Uptime</span>
+        <span class="sf-val" id="uptime">0d 0h 0m</span>
+      </div>
+      <div class="sf-row">
+        <span class="sf-label">Version</span>
+        <span class="sf-val muted">v2.4.1</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 class="page-title" id="pageTitle">Dashboard</h1>
+        <span class="page-subtitle">Real-time environmental monitoring</span>
+      </div>
+      <div class="topbar-right">
+        <div class="refresh-info">
+          <span class="ri-dot"></span>
+          <span class="ri-text">Live · updates every 3s</span>
+        </div>
+        <button class="btn-icon" onclick="triggerAlert()" title="Simulate alert">⚠</button>
+        <button class="btn-icon" onclick="toggleTheme()" title="Toggle theme" id="themeBtn">☾</button>
+      </div>
+    </header>
+
+    <!-- VIEWS -->
+
+    <!-- DASHBOARD VIEW -->
+    <div class="view active" id="viewDashboard">
+
+      <!-- STAT CARDS -->
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="sc-label">Avg Temperature</div>
+          <div class="sc-value" id="statTemp">--°C</div>
+          <div class="sc-trend" id="statTempTrend">—</div>
+          <div class="sc-icon temp-icon">🌡</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Avg Humidity</div>
+          <div class="sc-value" id="statHumid">--%</div>
+          <div class="sc-trend" id="statHumidTrend">—</div>
+          <div class="sc-icon">💧</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Air Quality (AQI)</div>
+          <div class="sc-value" id="statAQI">--</div>
+          <div class="sc-trend" id="statAQITrend">—</div>
+          <div class="sc-icon">🌬</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Active Alerts</div>
+          <div class="sc-value alert-val" id="statAlerts">0</div>
+          <div class="sc-trend" id="statAlertTrend">All systems normal</div>
+          <div class="sc-icon">🔔</div>
+        </div>
+      </div>
+
+      <!-- MAIN GRID -->
+      <div class="dash-grid">
+
+        <!-- ROOM SENSORS -->
+        <div class="panel panel-rooms">
+          <div class="panel-header">
+            <span class="ph-title">Room Sensors</span>
+            <span class="ph-badge" id="roomCount">4 rooms</span>
+          </div>
+          <div class="rooms-grid" id="roomsGrid"></div>
+        </div>
+
+        <!-- LIVE CHART -->
+        <div class="panel panel-chart">
+          <div class="panel-header">
+            <span class="ph-title">Temperature History</span>
+            <div class="chart-legend">
+              <span class="cl-item cyan">Living Room</span>
+              <span class="cl-item green">Bedroom</span>
+            </div>
+          </div>
+          <canvas id="tempChart" width="500" height="200"></canvas>
+        </div>
+
+        <!-- ALERT LOG -->
+        <div class="panel panel-alerts">
+          <div class="panel-header">
+            <span class="ph-title">Event Log</span>
+            <button class="ph-action" onclick="clearLog()">Clear</button>
+          </div>
+          <div class="alert-log" id="alertLog">
+            <div class="log-empty">No events yet. System monitoring...</div>
+          </div>
+        </div>
+
+        <!-- DEVICE CONTROLS -->
+        <div class="panel panel-controls">
+          <div class="panel-header">
+            <span class="ph-title">Device Controls</span>
+          </div>
+          <div class="controls-list" id="controlsList"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SENSORS VIEW -->
+    <div class="view" id="viewSensors">
+      <div class="sensors-detail" id="sensorsDetail"></div>
+    </div>
+
+    <!-- ALERTS VIEW -->
+    <div class="view" id="viewAlerts">
+      <div class="alerts-page" id="alertsPage">
+        <div class="log-empty">No alerts recorded.</div>
+      </div>
+    </div>
+
+    <!-- DEVICES VIEW -->
+    <div class="view" id="viewDevices">
+      <div class="devices-grid" id="devicesGrid"></div>
+    </div>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
