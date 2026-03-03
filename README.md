@@ -2,7 +2,7 @@
 
 A real-time IoT smart home monitoring dashboard with live sensor simulation, automated alert detection, device control, and data visualisation. Built to demonstrate IoT concepts, network monitoring principles, and dashboard UI development.
 
-**Live Demo:** [your-username.github.io/smarthome-dashboard](https://your-username.github.io/smarthome-dashboard)
+**Live Demo:**(https://nomcebom-dev.github.io/smarthome-dashboard)
 
 ---
 
